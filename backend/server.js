@@ -33,33 +33,22 @@ app.use(helmet());
 // =======================
 // RATE LIMITING
 // =======================
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api/', limiter);
+app.use(
+  '/api',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // =======================
 // CORS CONFIGURATION
 // =======================
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-
-      console.log('🚫 CORS blocked:', origin);
-      callback(new Error('Not allowed by CORS'));
-    },
+    origin: true,
     credentials: true,
   })
 );
@@ -78,14 +67,10 @@ app.use(compression());
 // =======================
 // LOGGING
 // =======================
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
+app.use(morgan('combined'));
 
 // =======================
-// DATABASE CONNECTION (MongoDB Atlas)
+// DATABASE CONNECTION
 // =======================
 if (!process.env.MONGODB_URI) {
   console.error('❌ MONGODB_URI is missing');
@@ -94,13 +79,18 @@ if (!process.env.MONGODB_URI) {
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB Atlas connected');
-  })
+  .then(() => console.log('✅ MongoDB Atlas connected'))
   .catch((err) => {
     console.error('❌ MongoDB connection failed:', err.message);
     process.exit(1);
   });
+
+// =======================
+// ROOT ROUTE (RENDER PORT SCAN FIX)
+// =======================
+app.get('/', (req, res) => {
+  res.status(200).send('Backend is running');
+});
 
 // =======================
 // HEALTH CHECK
@@ -108,8 +98,8 @@ mongoose
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
-    environment: process.env.NODE_ENV,
     uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
   });
 });
@@ -143,10 +133,15 @@ app.use(errorHandler);
 // =======================
 // SERVER START (RENDER SAFE)
 // =======================
-const PORT = process.env.PORT || 10000;
+const PORT = Number(process.env.PORT);
+
+if (!PORT) {
+  console.error('❌ Invalid PORT:', process.env.PORT);
+  process.exit(1);
+}
 
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV})`);
+  console.log(`🚀 Server listening on port ${PORT}`);
 });
 
 // =======================
@@ -163,10 +158,8 @@ process.on('uncaughtException', (err) => {
 });
 
 process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM received. Shutting down...');
-  server.close(() => {
-    console.log('✅ Server closed');
-  });
+  console.log('👋 SIGTERM received');
+  server.close(() => process.exit(0));
 });
 
 module.exports = app;
