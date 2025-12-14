@@ -7,7 +7,9 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-// Routes
+// =======================
+// IMPORT ROUTES
+// =======================
 const authRoutes = require('./routes/auth');
 const certificateRoutes = require('./routes/certificates');
 const adminRoutes = require('./routes/admin');
@@ -16,33 +18,33 @@ const ipfsRoutes = require('./routes/ipfs');
 const multilingualCertificateRoutes = require('./routes/multilingualCertificates');
 const autoCertificateRoutes = require('./routes/autoCertificates');
 
-// Middleware
+// =======================
+// IMPORT MIDDLEWARE
+// =======================
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-/* =======================
-   SECURITY
-======================= */
+// =======================
+// SECURITY
+// =======================
 app.use(helmet());
 
-/* =======================
-   RATE LIMITING
-======================= */
-app.use(
-  '/api/',
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'Too many requests, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
+// =======================
+// RATE LIMITING
+// =======================
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
 
-/* =======================
-   CORS
-======================= */
+// =======================
+// CORS CONFIGURATION
+// =======================
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -51,9 +53,10 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin(origin, callback) {
+    origin: function (origin, callback) {
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
+
       console.log('🚫 CORS blocked:', origin);
       callback(new Error('Not allowed by CORS'));
     },
@@ -61,25 +64,29 @@ app.use(
   })
 );
 
-/* =======================
-   BODY PARSING
-======================= */
+// =======================
+// BODY PARSING
+// =======================
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-/* =======================
-   COMPRESSION
-======================= */
+// =======================
+// COMPRESSION
+// =======================
 app.use(compression());
 
-/* =======================
-   LOGGING
-======================= */
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
+// =======================
+// LOGGING
+// =======================
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
 
-/* =======================
-   DATABASE
-======================= */
+// =======================
+// DATABASE CONNECTION (MongoDB Atlas)
+// =======================
 if (!process.env.MONGODB_URI) {
   console.error('❌ MONGODB_URI is missing');
   process.exit(1);
@@ -87,27 +94,29 @@ if (!process.env.MONGODB_URI) {
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Atlas connected'))
+  .then(() => {
+    console.log('✅ MongoDB Atlas connected');
+  })
   .catch((err) => {
-    console.error('❌ MongoDB error:', err.message);
+    console.error('❌ MongoDB connection failed:', err.message);
     process.exit(1);
   });
 
-/* =======================
-   HEALTH CHECK
-======================= */
+// =======================
+// HEALTH CHECK
+// =======================
 app.get('/api/health', (req, res) => {
-  res.json({
+  res.status(200).json({
     status: 'OK',
-    env: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV,
     uptime: process.uptime(),
-    time: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
   });
 });
 
-/* =======================
-   ROUTES
-======================= */
+// =======================
+// API ROUTES
+// =======================
 app.use('/api/auth', authRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/admin', adminRoutes);
@@ -116,43 +125,48 @@ app.use('/api/ipfs', ipfsRoutes);
 app.use('/api/multilingual-certificates', multilingualCertificateRoutes);
 app.use('/api/auto-certificates', autoCertificateRoutes);
 
-/* =======================
-   404
-======================= */
+// =======================
+// 404 HANDLER
+// =======================
 app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: 'API endpoint not found' });
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found',
+  });
 });
 
-/* =======================
-   ERROR HANDLER
-======================= */
+// =======================
+// ERROR HANDLER
+// =======================
 app.use(errorHandler);
 
-/* =======================
-   SERVER (RENDER FIX)
-======================= */
-const PORT = Number(process.env.PORT); // ⚠️ DO NOT use fallback
+// =======================
+// SERVER START (RENDER SAFE)
+// =======================
+const PORT = process.env.PORT || 10000;
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV})`);
 });
 
-/* =======================
-   GRACEFUL SHUTDOWN
-======================= */
+// =======================
+// GRACEFUL SHUTDOWN
+// =======================
 process.on('unhandledRejection', (err) => {
-  console.error('❌ Unhandled rejection:', err.message);
+  console.error('❌ Unhandled Promise Rejection:', err.message);
   server.close(() => process.exit(1));
 });
 
 process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught exception:', err.message);
+  console.error('❌ Uncaught Exception:', err.message);
   process.exit(1);
 });
 
 process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM received');
-  server.close(() => console.log('✅ Server closed'));
+  console.log('👋 SIGTERM received. Shutting down...');
+  server.close(() => {
+    console.log('✅ Server closed');
+  });
 });
 
 module.exports = app;
