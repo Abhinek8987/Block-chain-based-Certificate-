@@ -44,11 +44,20 @@ app.use(
 );
 
 // =======================
-// CORS CONFIGURATION
+// CORS
 // =======================
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('CORS blocked'));
+    },
     credentials: true,
   })
 );
@@ -70,10 +79,10 @@ app.use(compression());
 app.use(morgan('combined'));
 
 // =======================
-// DATABASE CONNECTION
+// DATABASE (MongoDB Atlas)
 // =======================
 if (!process.env.MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing');
+  console.error('❌ MONGODB_URI missing');
   process.exit(1);
 }
 
@@ -81,31 +90,23 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB Atlas connected'))
   .catch((err) => {
-    console.error('❌ MongoDB connection failed:', err.message);
+    console.error('❌ MongoDB error:', err.message);
     process.exit(1);
   });
-
-// =======================
-// ROOT ROUTE (RENDER PORT SCAN FIX)
-// =======================
-app.get('/', (req, res) => {
-  res.status(200).send('Backend is running');
-});
 
 // =======================
 // HEALTH CHECK
 // =======================
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
+  res.json({
     status: 'OK',
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
   });
 });
 
 // =======================
-// API ROUTES
+// ROUTES
 // =======================
 app.use('/api/auth', authRoutes);
 app.use('/api/certificates', certificateRoutes);
@@ -116,13 +117,10 @@ app.use('/api/multilingual-certificates', multilingualCertificateRoutes);
 app.use('/api/auto-certificates', autoCertificateRoutes);
 
 // =======================
-// 404 HANDLER
+// 404
 // =======================
 app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'API endpoint not found',
-  });
+  res.status(404).json({ message: 'API endpoint not found' });
 });
 
 // =======================
@@ -131,35 +129,12 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // =======================
-// SERVER START (RENDER SAFE)
+// SERVER (RENDER SAFE)
 // =======================
 const PORT = Number(process.env.PORT);
 
-if (!PORT) {
-  console.error('❌ Invalid PORT:', process.env.PORT);
-  process.exit(1);
-}
-
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server listening on port ${PORT}`);
-});
-
-// =======================
-// GRACEFUL SHUTDOWN
-// =======================
-process.on('unhandledRejection', (err) => {
-  console.error('❌ Unhandled Promise Rejection:', err.message);
-  server.close(() => process.exit(1));
-});
-
-process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught Exception:', err.message);
-  process.exit(1);
-});
-
-process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM received');
-  server.close(() => process.exit(0));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 module.exports = app;
