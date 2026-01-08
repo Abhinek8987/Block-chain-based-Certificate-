@@ -65,21 +65,28 @@ const QRScannerPage = () => {
 
   const handleScanResult = (data) => {
     console.log('QR scan result:', data);
-    stopScanning();
-    
-    // Handle both certificate and verification URLs
-    if (data.includes('/certificate/')) {
-      const certificateId = data.split('/certificate/')[1];
-      navigate(`/certificate/${certificateId}`);
-    } else if (data.includes('/verify/')) {
-      const certificateId = data.split('/verify/')[1];
+
+    // Strict validation: Must contain certificate or verification path
+    // AND must have a valid looking MongoID (24 hex chars)
+    const hasValidPath = data.includes('/certificate/') || data.includes('/verify/');
+    const idMatch = data.match(/[a-fA-F0-9]{24}/);
+
+    if (hasValidPath && idMatch) {
+      stopScanning();
+      const certificateId = idMatch[0];
+      toast.success('Certificate QR detected');
       navigate(`/verify/${certificateId}`);
-    } else if (data.startsWith('http')) {
-      // If it's a URL, try to open it
-      window.open(data, '_blank');
     } else {
-      setScanResult(data);
-      toast.success('QR code scanned successfully');
+      // If it's a completely different URL or text, show error
+      console.warn('Invalid QR detected:', data);
+
+      // Don't stop scanning immediately, just show error so user can try another
+      if (!error) {
+        setError('Invalid QR Code: Not a valid certificate');
+        toast.error('This QR code is not from our system');
+        // Clear error after 3 seconds to allow retrying
+        setTimeout(() => setError(''), 3000);
+      }
     }
   };
 
@@ -132,7 +139,7 @@ const QRScannerPage = () => {
         {/* Scanner Section */}
         <div className="card">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Camera Scanner</h2>
-          
+
           <div className="space-y-4">
             {/* Video Preview */}
             <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
@@ -151,7 +158,7 @@ const QRScannerPage = () => {
                   </div>
                 </div>
               )}
-              
+
               {scanning && (
                 <div className="absolute inset-0 border-2 border-primary-500 rounded-lg">
                   <div className="absolute top-4 left-4 right-4 text-center">
@@ -200,7 +207,7 @@ const QRScannerPage = () => {
           {/* File Upload */}
           <div className="card">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Upload QR Image</h2>
-            
+
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
               <div className="text-center">
                 <Upload className="mx-auto h-8 w-8 text-gray-400 mb-3" />
@@ -227,7 +234,7 @@ const QRScannerPage = () => {
           {/* Manual URL Entry */}
           <div className="card">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Manual Verification</h2>
-            
+
             <form onSubmit={handleManualSubmit} className="space-y-4">
               <div>
                 <label htmlFor="manualUrl" className="block text-sm font-medium text-gray-700">
@@ -247,7 +254,7 @@ const QRScannerPage = () => {
                   />
                 </div>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full btn-primary"
@@ -262,7 +269,7 @@ const QRScannerPage = () => {
           {scanResult && (
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Scan Result</h2>
-              
+
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-start">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
@@ -272,7 +279,7 @@ const QRScannerPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <button
                 onClick={resetScanner}
                 className="mt-4 w-full btn-secondary"
@@ -287,7 +294,7 @@ const QRScannerPage = () => {
       {/* Instructions */}
       <div className="mt-8 card">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="p-3 bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
@@ -298,7 +305,7 @@ const QRScannerPage = () => {
               Click "Start Scanning" and point your camera at the QR code
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="p-3 bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
               <Upload className="h-6 w-6 text-primary-600" />
@@ -308,7 +315,7 @@ const QRScannerPage = () => {
               Upload a saved image containing a QR code from your device
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="p-3 bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
               <Search className="h-6 w-6 text-primary-600" />

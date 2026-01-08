@@ -15,7 +15,7 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -36,19 +36,18 @@ const Signup = () => {
 
     setLoading(true);
     const result = await signup(formData);
-    
+
     if (result.success) {
       navigate(`/${result.user.role}`);
     }
-    
+
     setLoading(false);
   };
 
   const roleIcons = {
     student: GraduationCap,
     institution: Building,
-    verifier: Shield,
-    admin: User
+    verifier: Shield
   };
 
   return (
@@ -119,11 +118,10 @@ const Signup = () => {
                 {Object.entries(roleIcons).map(([role, Icon]) => (
                   <label
                     key={role}
-                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.role === role
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.role === role
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-gray-300 hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     <input
                       type="radio"

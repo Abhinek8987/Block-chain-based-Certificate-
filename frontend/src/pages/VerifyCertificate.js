@@ -11,7 +11,7 @@ const VerifyCertificate = () => {
   const [blockchainVerification, setBlockchainVerification] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const { contract } = useWeb3();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const VerifyCertificate = () => {
         try {
           const isValidOnBlockchain = await contract.verifyCertificate(certData.certificate.blockchainId);
           const blockchainCert = await contract.getCertificateById(certData.certificate.blockchainId);
-          
+
           setBlockchainVerification({
             isValid: isValidOnBlockchain,
             data: blockchainCert
@@ -159,9 +159,30 @@ const VerifyCertificate = () => {
             {error && (
               <p className="text-lg text-gray-600 mb-4">{error}</p>
             )}
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-6">
               Certificate ID: {certificateId}
             </p>
+
+            {/* Action Buttons for Invalid/Warning State */}
+            {(verificationStatus === 'invalid' || verificationStatus === 'warning') && (
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => window.location.href = '/scan-qr'}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Scan Another
+                </button>
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Home
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -240,15 +261,14 @@ const VerifyCertificate = () => {
                       <Shield className="h-5 w-5 text-gray-400" />
                       <div>
                         <p className="text-sm font-medium text-gray-500">Verification Status</p>
-                        <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
-                          verificationStatus === 'valid'
+                        <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${verificationStatus === 'valid'
                             ? 'bg-green-100 text-green-800'
                             : verificationStatus === 'invalid'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {verificationStatus === 'valid' ? 'Verified' : 
-                           verificationStatus === 'invalid' ? 'Invalid' : 'Partial'}
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {verificationStatus === 'valid' ? 'Verified' :
+                            verificationStatus === 'invalid' ? 'Invalid' : 'Partial'}
                         </span>
                       </div>
                     </div>
@@ -269,13 +289,13 @@ const VerifyCertificate = () => {
               {/* Verification Checklist */}
               <div className="card">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Verification Checklist</h3>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Database Record</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">IPFS Storage</span>
                     {certificate.certificate.ipfsHash ? (
@@ -284,7 +304,7 @@ const VerifyCertificate = () => {
                       <XCircle className="h-5 w-5 text-red-600" />
                     )}
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Blockchain Record</span>
                     {blockchainVerification?.isValid ? (
@@ -302,7 +322,7 @@ const VerifyCertificate = () => {
               {blockchainVerification?.data && (
                 <div className="card">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Blockchain Details</h3>
-                  
+
                   <div className="space-y-3 text-sm">
                     <div>
                       <p className="text-gray-500">Certificate ID</p>
@@ -310,21 +330,21 @@ const VerifyCertificate = () => {
                         {certificate.certificate.blockchainId}
                       </p>
                     </div>
-                    
+
                     <div>
                       <p className="text-gray-500">Issuer Address</p>
                       <p className="font-mono text-gray-900 break-all">
                         {blockchainVerification.data.issuer}
                       </p>
                     </div>
-                    
+
                     <div>
                       <p className="text-gray-500">Issue Timestamp</p>
                       <p className="text-gray-900">
                         {formatTimestamp(blockchainVerification.data.issueDate)}
                       </p>
                     </div>
-                    
+
                     {certificate.certificate.transactionHash && (
                       <div>
                         <p className="text-gray-500">Transaction Hash</p>
@@ -347,7 +367,7 @@ const VerifyCertificate = () => {
               {certificate.certificate.ipfsHash && (
                 <div className="card">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">IPFS Storage</h3>
-                  
+
                   <div className="space-y-3 text-sm">
                     <div>
                       <p className="text-gray-500">IPFS Hash</p>
@@ -355,7 +375,7 @@ const VerifyCertificate = () => {
                         {certificate.certificate.ipfsHash}
                       </p>
                     </div>
-                    
+
                     <a
                       href={`https://gateway.pinata.cloud/ipfs/${certificate.certificate.ipfsHash}`}
                       target="_blank"
@@ -372,11 +392,11 @@ const VerifyCertificate = () => {
               {/* Verification Timestamp */}
               <div className="card">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Verification Info</h3>
-                
+
                 <div className="text-sm text-gray-600">
                   <p>Verified on: {new Date().toLocaleString()}</p>
                   <p className="mt-2">
-                    This verification was performed using blockchain technology 
+                    This verification was performed using blockchain technology
                     and cryptographic hashing to ensure authenticity.
                   </p>
                 </div>

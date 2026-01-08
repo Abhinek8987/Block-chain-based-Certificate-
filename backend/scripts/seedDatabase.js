@@ -55,11 +55,8 @@ const seedUsers = async () => {
       }
     ];
 
-    // Hash passwords and create users
+    // Create users (pre-save hook will handle hashing)
     for (const userData of demoUsers) {
-      const salt = await bcrypt.genSalt(12);
-      userData.password = await bcrypt.hash(userData.password, salt);
-      
       const user = await User.create(userData);
       console.log(`✅ Created ${user.role}: ${user.email}`);
     }

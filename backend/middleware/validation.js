@@ -33,7 +33,7 @@ const validateUserRegistration = [
     .withMessage('Invalid role'),
 
   body('organization')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Organization name must be between 2 and 200 characters'),
