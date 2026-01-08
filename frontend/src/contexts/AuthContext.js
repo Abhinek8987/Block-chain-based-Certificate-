@@ -47,11 +47,11 @@ export const AuthProvider = ({ children }) => {
       });
 
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
-      
+
       toast.success('Login successful!');
       return { success: true, user };
     } catch (error) {
@@ -64,17 +64,23 @@ export const AuthProvider = ({ children }) => {
   const signup = async (userData) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/signup`, userData);
-      
+
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
-      
+
       toast.success('Account created successfully!');
       return { success: true, user };
     } catch (error) {
-      const message = error.response?.data?.message || 'Signup failed';
+      let message = error.response?.data?.message || 'Signup failed';
+
+      // Check for validation errors array
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        message = error.response.data.errors.map(err => err.msg).join('\n');
+      }
+
       toast.error(message);
       return { success: false, message };
     }

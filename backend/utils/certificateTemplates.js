@@ -88,6 +88,211 @@ const templates = {
   }
 };
 
+// Check if language uses non-Latin script
+const isIndianLanguage = (language) => {
+  return ['hindi', 'tamil', 'telugu', 'malayalam', 'kannada', 'marathi', 'gujarati', 'bengali', 'punjabi', 'urdu'].includes(language.toLowerCase());
+};
+
+// Transliteration fallbacks for Indian languages
+const transliterationFallbacks = {
+  hindi: {
+    'पूर्णता प्रमाणपत्र': 'Purnata Pramanpatra (Certificate of Completion)',
+    'यह प्रमाणित करता है कि': 'Yah Pramanit Karta Hai Ki (This is to certify that)',
+    'ने सफलतापूर्वक पूरा किया है': 'Ne Safaltapurvak Pura Kiya Hai (has successfully completed)',
+    'द्वारा जारी': 'Dvara Jari (Issued by)',
+    'जारी करने की तारीख': 'Jari Karne Ki Tarikh (Date of Issue)',
+    'ग्रेड': 'Grade (ग्रेड)',
+    'प्रमाणपत्र आईडी': 'Pramanpatra ID (Certificate ID)',
+    'उपलब्धि': 'Upalabdhi (Achievement)',
+    'सत्यापन के लिए स्कैन करें': 'Satyapan Ke Liye Scan Karen (Scan to Verify)',
+    'अवधि': 'Avadhi (Duration)',
+    'से': 'Se (From)',
+    'तक': 'Tak (To)',
+    'शिक्षक': 'Shikshak (Instructor)',
+    'अधिकृत हस्ताक्षर': 'Adhikrit Hastakshar (Authorized Signature)'
+  },
+  marathi: {
+    'पूर्णता प्रमाणपत्र': 'Purnata Pramanpatra (Certificate of Completion)',
+    'हे प्रमाणित करते की': 'He Pramanit Karte Ki (This is to certify that)',
+    'हे प्रमाणित करते': 'He Pramanit Karta (This is to certify)',
+    'यांनी यशस्वीरित्या पूर्ण केले आहे': 'Yanani Yashasviritya Purna Kele Aahe (has successfully completed)',
+    'यशस्वीरित्या पूर्ण केले आहे': 'Yashasviritya Purna Kele Aahe (has successfully completed)',
+    'द्वारा जारी': 'Dvare Jari (Issued by)',
+    'द्वारे जारी': 'Dvare Jari (Issued by)',
+    'जारी करण्याची तारीख': 'Jari Karnyachi Tarikh (Date of Issue)',
+    'श्रेणी': 'Shreni (Grade)',
+    'प्रमाणपत्र आयडी': 'Pramanpatra ID (Certificate ID)',
+    'प्रमाणपत्र ID': 'Pramanpatra ID (Certificate ID)',
+    'यश': 'Yash (Achievement)',
+    'पडताळणीसाठी स्कॅन करा': 'Padtalnisathi Scan Kara (Scan to Verify)',
+    'कालावधी': 'Kalavadhi (Duration)',
+    'पासुन': 'Pasun (From)',
+    'पर्यंत': 'Paryant (To)',
+    'शिक्षक': 'Shikshak (Instructor)',
+    'अधिकृत स्वाक्षरी': 'Adhikrut Swakshari (Authorized Signature)'
+  },
+  tamil: {
+    'நிறைவு சான்றிதழ்': 'Niraivu Saanridhazh (Certificate of Completion)',
+    'இது சான்றளிக்கிறது': 'Idhu Saanralikkiradhu (This is to certify that)',
+    'வெற்றிகரமாக முடித்துள்ளார்': 'Vetrikaramaaga Muditthullaar (has successfully completed)',
+    'வழங்கியவர்': 'Vazhangiyavar (Issued by)',
+    'வழங்கிய தேதி': 'Vazhangiya Thethi (Date of Issue)',
+    'தரம்': 'Tharam (Grade)',
+    'விளக்கம்': 'Vilakkam (Description)',
+    'சான்றிதழ் எண்': 'Saandridhazh En (Certificate ID)',
+    'சாதனை': 'Sadhanai (Achievement)',
+    'சரிபார்க்க ஸ்கேன் செய்யவும்': 'Sariparka Scan Seiyavum (Scan to Verify)',
+    'காலம்': 'Kaalam (Duration)',
+    'லிருந்து': 'Lirundhu (From)',
+    'வரை': 'Varai (To)',
+    'ஆசிரியர்': 'Aasiriyar (Instructor)',
+    'அங்கீகரிக்கப்பட்ட கையொப்பம்': 'Angikarikpatta Kaioppam (Authorized Signature)'
+  },
+  telugu: {
+    'పూర్తి చేసిన ప్రమాణపత్రం': 'Purti Chesina Pramaanapatram (Certificate of Completion)',
+    'ఇది ధృవీకరిస్తుంది': 'Idi Dhruveekaristhundi (This is to certify that)',
+    'విజయవంతంగా పూర్తి చేశారు': 'Vijayavanthamgaa Purti Cheshaaru (has successfully completed)',
+    'జారీ చేసినవారు': 'Jaari Chesinavaaru (Issued by)',
+    'జారీ చేసిన తేదీ': 'Jaari Chesina Thedhi (Date of Issue)',
+    'గ్రేడ్': 'Grade (గ్రేడ్)',
+    'వివరణ': 'Vivarna (Description)',
+    'ప్రమాణపత్ర ID': 'Pramaanapatra ID (Certificate ID)',
+    'సాధన': 'Saadhana (Achievement)',
+    'ధృవీకరించడానికి స్కాన్ చేయండి': 'Dhruvikarinchadaniki Scan Cheyandi (Scan to Verify)',
+    'నిడివి': 'Nidivi (Duration)',
+    'నుండి': 'Nundi (From)',
+    'వరకు': 'Varaku (To)',
+    'బోధకుడు': 'Bodhakudu (Instructor)',
+    'అధికృత సంతకం': 'Adhikrutha Santhakam (Authorized Signature)'
+  },
+  malayalam: {
+    'പൂർത്തീകരണ സർട്ടിഫിക്കറ്റ്': 'Purttheekarana Certificate (Certificate of Completion)',
+    'ഇത് സാക്ഷ്യപ്പെടുത്തുന്നു': 'Ithu Saakshyappeduthunnu (This is to certify that)',
+    'വിജയകരമായി പൂർത്തിയാക്കി': 'Vijayakaramaayi Purtthiyaakki (has successfully completed)',
+    'നൽകിയത്': 'Nalkiyathu (Issued by)',
+    'നൽകിയ തീയതി': 'Nalkiya Theeyathi (Date of Issue)',
+    'ഗ്രേഡ്': 'Grade (ഗ്രേഡ്)',
+    'വിവരണം': 'Vivaranam (Description)',
+    'സർട്ടിഫിക്കറ്റ് ID': 'Certificate ID (സർട്ടിഫിക്കറ്റ് ID)',
+    'നേട്ടം': 'Nettam (Achievement)',
+    'പരിശോധിക്കാൻ സ്കാൻ ചെയ്യുക': 'Parishodhikuvan Scan Cheyyuka (Scan to Verify)',
+    'കാലയളവ്': 'Kaalayalavu (Duration)',
+    'മുതൽ': 'Muthal (From)',
+    'വരെ': 'Vare (To)',
+    'അധ്യാപകൻ': 'Adhyapakan (Instructor)',
+    'അംഗീകൃത ഒപ്പ്': 'Angikrutha Oppu (Authorized Signature)'
+  },
+  kannada: {
+    'ಪೂರ್ಣಗೊಳಿಸುವಿಕೆಯ ಪ್ರಮಾಣಪತ್ರ': 'Purnagolisuvikkeya Pramanapatra (Certificate of Completion)',
+    'ಇದು ಪ್ರಮಾಣೀಕರಿಸುತ್ತದೆ': 'Idu Pramanekarisuttade (This is to certify that)',
+    'ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದಾರೆ': 'Yashasviyaagi Purnagolisiddaare (has successfully completed)',
+    'ನೀಡಿದವರು': 'Needidavaru (Issued by)',
+    'ನೀಡಿದ ದಿನಾಂಕ': 'Needida Dinaanka (Date of Issue)',
+    'ಗ್ರೇಡ್': 'Grade (ಗ್ರೇಡ್)',
+    'ಪ್ರಮಾಣಪತ್ರ ID': 'Pramanapatra ID (Certificate ID)',
+    'ಸಾಧನೆ': 'Sadhane (Achievement)',
+    'ಪರಿಶೀಲಿಸಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ': 'Parisheeleesalu Scan Maadi (Scan to Verify)',
+    'ಅವಧಿ': 'Avadhi (Duration)',
+    'ಇಂದ': 'Inda (From)',
+    'ವರೆಗೆ': 'Varege (To)',
+    'ಶಿಕ್ಷಕ': 'Shikshaka (Instructor)',
+    'ಅಧಿಕೃತ ಸಹಿ': 'Adhikrutha Sahi (Authorized Signature)'
+  },
+  gujarati: {
+    'પૂર્ણતા પ્રમાણપત્ર': 'Purnata Pramanpatra (Certificate of Completion)',
+    'આ પ્રમાણિત કરે છે': 'Aa Pramanit Kare Chhe (This is to certify)',
+    'આ પ્રમાણિત કરે છે કે': 'Aa Pramanit Kare Chhe Ke (This is to certify that)',
+    'સફળતાપૂર્વક પૂર્ણ કર્યું છે': 'Safaltapurvak Purna Karyu Chhe (has successfully completed)',
+    'દ્વારા જારી': 'Dvara Jari (Issued by)',
+    'જારી કરવાની તારીખ': 'Jari Karvani Tarikh (Date of Issue)',
+    'ગ્રેડ': 'Grade (ગ્રેડ)',
+    'પ્રમાણપત્ર આઈડી': 'Pramanpatra ID (Certificate ID)',
+    'પ્રમાણપત્ર ID': 'Pramanpatra ID (Certificate ID)',
+    'સિદ્ધિ': 'Siddhi (Achievement)',
+    'ચકાસણી માટે સ્કેન કરો': 'Chakasani Mate Scan Karo (Scan to Verify)',
+    'સમયગાળો': 'Samaygalo (Duration)',
+    'થી': 'Thi (From)',
+    'સુધી': 'Sudhi (To)',
+    'શિક્ષક': 'Shikshak (Instructor)',
+    'અધિકૃત સહી': 'Adhikrut Sahi (Authorized Signature)'
+  },
+  bengali: {
+    'সমাপনী সনদপত্র': 'Somaponi Sonodpotro (Certificate of Completion)',
+    'সমাপনী সার্টিফিকেট': 'Somaponi Certificate (Certificate of Completion)',
+    'এটি প্রত্যয়ন করে': 'Eti Prottoyon Kore (This is to certify)',
+    'এটি প্রত্যয়ন করে যে': 'Eti Prottoyon Kore Je (This is to certify that)',
+    'সফলভাবে সম্পন্ন করেছেন': 'Sofolbhabe Somponno Korechhen (has successfully completed)',
+    'দ্বারা জারি': 'Dvara Jari (Issued by)',
+    'জারির তারিখ': 'Jarir Tarikh (Date of Issue)',
+    'গ্রেড': 'Grade (গ্রেড)',
+    'সার্টিফিকেট আইডি': 'Certificate ID (সার্টিফিকেট আইডি)',
+    'সনদপত্র ID': 'Sonodpotro ID (Certificate ID)',
+    'অর্জন': 'Orjon (Achievement)',
+    'যাচাই করতে স্ক্যান করুন': 'Jachai Korte Scan Korun (Scan to Verify)',
+    'সময়কাল': 'Somoykal (Duration)',
+    'থেকে': 'Theke (From)',
+    'পর্যন্ত': 'Porjonto (To)',
+    'শিক্ষক': 'Shikkhok (Instructor)',
+    'অনুমোদিত স্বাক্ষর': 'Onumodito Swakkhor (Authorized Signature)'
+  },
+  punjabi: {
+    'ਸੰਪੂਰਨਤਾ ਪ੍ਰਮਾਣ ਪੱਤਰ': 'Sampuranta Praman Patra (Certificate of Completion)',
+    'ਸਮਾਪਤੀ ਦਾ ਸਰਟੀਫਿਕੇਟ': 'Samapti Da Certificate (Certificate of Completion)',
+    'ਇਹ ਪ੍ਰਮਾਣਿਤ ਕਰਦਾ ਹੈ': 'Ih Pramanit Karda Hai (This is to certify)',
+    'ਇਹ ਪ੍ਰਮਾਣਿਤ ਕਰਦਾ ਹੈ ਕਿ': 'Ih Pramanit Karda Hai Ki (This is to certify that)',
+    'ਸਫਲਤਾਪੂਰਵਕ ਪੂਰਾ ਕੀਤਾ ਹੈ': 'Safaltapurvak Pura Kita Hai (has successfully completed)',
+    'ਦੁਆਰਾ ਜਾਰੀ': 'Duara Jari (Issued by)',
+    'ਜਾਰੀ ਕਰਨ ਦੀ ਤਾਰੀਖ': 'Jari Karan Di Tarikh (Date of Issue)',
+    'ਗ੍ਰੇਡ': 'Grade (ਗ੍ਰੇਡ)',
+    'ਸਰਟੀਫਿਕੇਟ ਆਈਡੀ': 'Certificate ID (ਸਰਟੀਫਿਕੇਟ ਆਈਡੀ)',
+    'ਪ੍ਰਮਾਣ ਪੱਤਰ ID': 'Praman Patra ID (Certificate ID)',
+    'ਪ੍ਰਾਪਤੀ': 'Prapti (Achievement)',
+    'ਪੁਸ਼ਟੀ ਕਰਨ ਲਈ ਸਕੈਨ ਕਰੋ': 'Pushti Karan Lai Scan Karo (Scan to Verify)',
+    'ਮਿਆਦ': 'Miad (Duration)',
+    'ਤੋਂ': 'Ton (From)',
+    'ਤੱਕ': 'Tak (To)',
+    'ਅਧਿਆਪਕ': 'Adhyapak (Instructor)',
+    'ਅਧਿਕਾਰਤ ਦਸਤਖਤ': 'Adhikarat Dastakhat (Authorized Signature)'
+  },
+  urdu: {
+    'تکمیل کا سرٹیفکیٹ': 'Takmeel Ka Certificate (Certificate of Completion)',
+    'یہ تصدیق کرتا ہے': 'Yeh Tasdeeq Karta Hai (This is to certify)',
+    'یہ تصدیق کرتا ہے کہ': 'Yeh Tasdeeq Karta Hai Keh (This is to certify that)',
+    'کامیابی سے مکمل کیا ہے': 'Kamyabi Se Mukammal Kiya Hai (has successfully completed)',
+    'کی طرف سے جاری': 'Ki Taraf Se Jari (Issued by)',
+    'جاری کرنے کی تاریخ': 'Jari Karne Ki Tarikh (Date of Issue)',
+    'گریڈ': 'Grade (گریڈ)',
+    'سرٹیفکیٹ آئی ڈی': 'Certificate ID (سرٹیفکیٹ آئی ڈی)',
+    'سرٹیفکیٹ ID': 'Certificate ID (سرٹیفکیٹ آئی ڈی)',
+    'کامیابی': 'Kamyabi (Achievement)',
+    'تصدیق کے لیے اسکین کریں۔': 'Tasdeeq Ke Liye Scan Karen (Scan to Verify)',
+    'دورانیہ': 'Duraniya (Duration)',
+    'سے': 'Se (From)',
+    'تک': 'Tak (To)',
+    'استاد': 'Ustad (Instructor)',
+    'مجاز دستخط': 'Majaz Dastakhat (Authorized Signature)'
+  }
+};
+
+// Convert text to hybrid representation (using just transliteration when fonts are disabled)
+const prepareTextForRendering = (text, language) => {
+  if (!text) return '';
+  if (!isIndianLanguage(language)) return text;
+
+  const langKey = language.toLowerCase();
+  const fallbacks = transliterationFallbacks[langKey];
+
+  if (fallbacks && fallbacks[text]) {
+    // When falling back to Times-Roman, we MUST use transliteration 
+    // because proper Unicode fonts are disabled/crashing.
+    // Unicode text would render as garbage characters with Times-Roman.
+    return fallbacks[text];
+  }
+
+  // If no transliteration found, return text but it might be garbage with Times-Roman
+  return text;
+};
+
 // Extended language support (all 22 Indian languages)
 const extendedTranslations = {
   english: {
@@ -376,13 +581,22 @@ class CertificateTemplateEngine {
     }));
   }
 
+  // Helper to check if text is English/Latin
+  isLatinText(text) {
+    // Matches basic Latin characters, numbers, common punctuation. 
+    // If text contains ANY character outside this range (like Hindi chars), it returns false.
+    // Matches all standard ASCII printable characters (32-126)
+    // Includes letters, numbers, punctuation, symbols.
+    // If text contains anything outside this (like Hindi, Tamil, etc.), it returns false.
+    return /^[\x20-\x7E]+$/.test(text);
+  }
+
   // Get translation for specific language and key
   getTranslation(language, key) {
     const lang = language.toLowerCase();
-    if (!this.translations[lang]) {
-      return this.translations.english[key] || key;
-    }
-    return this.translations[lang][key] || this.translations.english[key] || key;
+
+    // Default fallback logic
+    return this.translations[lang]?.[key] || this.translations.english[key] || key;
   }
 
   // Generate QR Code Image
@@ -415,18 +629,106 @@ class CertificateTemplateEngine {
     let fontBold = 'Helvetica-Bold';
     let fontOblique = 'Helvetica-Oblique';
 
+    console.log("DEBUG: Starting drawCertificate. Font init complete.");
+
+    // Helper to select font based on content
+    const getFont = (text, defaultNativeFont, fallbackLatin = 'Latin_Regular') => {
+      if (!data.language) return defaultNativeFont;
+      if (!isIndianLanguage(data.language)) return defaultNativeFont;
+      if (this.isLatinText(text)) return fallbackLatin;
+      return defaultNativeFont;
+    };
+
+    // Helper to draw text safely with fallback
+    const drawSafeText = (text, x, y, options = {}) => {
+      try {
+        doc.text(text, x, y, options);
+      } catch (e) {
+        console.warn(`Draw failed for text (len=${text ? text.length : 0}). Fallback to Helvetica. Error: ${e.message}`);
+        try {
+          doc.font('Helvetica');
+          // Remove alignment if it caused the crash? Try keeping it first.
+          doc.text(text, x, y, options);
+        } catch (e2) {
+          console.error("Critical Draw Failure even with fallback");
+        }
+      }
+    };
+
+    // Helper to draw mixed text centered
+    const drawMixedTextCentered = (doc, segments, y, width) => {
+      let totalWidth = 0;
+      const processedSegments = segments.map(seg => {
+        // Auto-detect Latin text and override font to Latin if needed
+        let fontToUse = seg.font;
+        if (this.isLatinText(seg.text) && isIndianLanguage(data.language)) {
+          if (fontToUse && fontToUse.includes('Bold')) fontToUse = 'Latin_Bold';
+          else if (fontToUse && (fontToUse.includes('Oblique') || fontToUse.includes('Italic'))) fontToUse = 'Latin_Oblique';
+          else fontToUse = 'Latin_Regular';
+        }
+
+        try {
+          doc.font(fontToUse);
+        } catch (e) {
+          fontToUse = 'Helvetica';
+        }
+
+        doc.font(fontToUse).fontSize(seg.fontSize || 12);
+
+        let w = 0;
+        try {
+          w = doc.widthOfString(seg.text);
+        } catch (e) {
+          console.warn(`Width measure failed. Fallback to Helvetica.`);
+          try {
+            doc.font('Helvetica');
+            w = doc.widthOfString(seg.text);
+            fontToUse = 'Helvetica';
+          } catch (e2) {
+            w = seg.text.length * 6;
+          }
+        }
+
+        totalWidth += w;
+        return { ...seg, font: fontToUse, width: w };
+      });
+
+      let currentX = (width - totalWidth) / 2;
+      if (currentX < margin) currentX = margin;
+
+      processedSegments.forEach(seg => {
+        doc.font(seg.font).fontSize(seg.fontSize || 12).fillColor(seg.color || colors.text);
+        // Use drawSafeText internally
+        drawSafeText(seg.text, currentX, y, { continued: false, lineBreak: false });
+        currentX += seg.width;
+      });
+    };
+
     try {
       if (data.language && data.language.toLowerCase() !== 'english') {
+        // Register Latin Fonts for Mixed Content (English Names in Native Templates)
+        // Using TTF font avoids crash when switching from Native TTF -> Standard AFM (Helvetica)
+        const latinReg = path.join(__dirname, '..', 'fonts', 'NotoSans-Regular.ttf');
+        const latinBold = path.join(__dirname, '..', 'fonts', 'NotoSans-Bold.ttf');
+        const latinOblique = path.join(__dirname, '..', 'fonts', 'NotoSans-Italic.ttf');
+
+        if (fs.existsSync(latinReg)) { doc.registerFont('Latin_Regular', latinReg); console.log("Registered Latin_Regular"); }
+        if (fs.existsSync(latinBold)) { doc.registerFont('Latin_Bold', latinBold); console.log("Registered Latin_Bold"); }
+        if (fs.existsSync(latinOblique)) { doc.registerFont('Latin_Oblique', latinOblique); console.log("Registered Latin_Oblique"); }
+
         const fontMap = {
           hindi: 'NotoSansDevanagari-Regular.ttf',
-          marathi: 'NotoSansDevanagari-Regular.ttf',
+          marathi: 'NotoSansDevanagari-Regular.ttf', // Hindi font covers Marathi
           tamil: 'NotoSansTamil-Regular.ttf',
-          telugu: 'NotoSansTelugu-Regular.ttf',
+          // Use TenaliRamakrishna (Static) for Telugu stability
+          telugu: 'TenaliRamakrishna-Regular.ttf',
           kannada: 'NotoSansKannada-Regular.ttf',
-          malayalam: 'NotoSansMalayalam-Regular.ttf',
+          // Use Manjari (Static) for Malayalam stability
+          malayalam: 'Manjari-Regular.ttf',
           bengali: 'NotoSansBengali-Regular.ttf',
           gujarati: 'NotoSansGujarati-Regular.ttf',
-          punjabi: 'NotoSansGurmukhi-Regular.ttf',
+          // Use Mukta Mahee (Static) for Punjabi coverage
+          punjabi: 'MuktaMahee-Regular.ttf',
           urdu: 'NotoSansArabic-Regular.ttf',
           assamese: 'NotoSansBengali-Regular.ttf',
           odia: 'NotoSansOriya-Regular.ttf'
@@ -442,17 +744,30 @@ class CertificateTemplateEngine {
           if (fs.existsSync(fontPath)) {
             // 2. Register Font
             const fontName = `Regional_${langKey}`;
-            doc.registerFont(fontName, fontPath);
+            try {
+              doc.registerFont(fontName, fontPath);
 
-            // 3. Set Fonts - CRITICAL: Mapped to same Regular font to prevent fake bold crash
-            fontRegular = fontName;
-            fontBold = fontName;
-            fontOblique = fontName;
+              // 3. Set Fonts - CRITICAL: Mapped to same Regular font to prevent fake bold crash
+              fontRegular = fontName;
+              fontBold = fontName;
+              fontOblique = fontName;
 
-            console.log(`✅ Successfully loaded Unicode font: ${fontName}`);
+              console.log(`✅ Successfully loaded Unicode font: ${fontName}`);
+            } catch (e) {
+              console.warn(`⚠️ Failed to register font ${fontPath}: ${e.message}. Using fallback.`);
+            }
           } else {
             console.warn(`⚠️ Font file missing: ${fontPath}. Fallback to Helvetica.`);
           }
+        }
+
+        // If we failed to set a custom font (still Helvetica or Times), THEN fallback to Times-Roman for Indian languages
+        // to at least prevent crash, though standard fonts might not render complex scripts perfect.
+        if (fontRegular === 'Helvetica' && isIndianLanguage(langKey)) {
+          fontRegular = 'Times-Roman';
+          fontBold = 'Times-Bold';
+          fontOblique = 'Times-Italic';
+          console.log(`🛡️  Using safe fallback font (Times-Roman) for ${langKey}`);
         }
       }
     } catch (fontError) {
@@ -496,11 +811,11 @@ class CertificateTemplateEngine {
     // Title
     doc.fillColor(colors.primary)
       .font(fontBold) // Safe Font
-      .fontSize(36)
-      .text(this.getTranslation(data.language, 'certificateOfCompletion'), 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      .fontSize(36);
+    drawSafeText(this.getTranslation(data.language, 'certificateOfCompletion'), 0, currentY, {
+      align: 'center',
+      width: pageWidth
+    });
 
     currentY += 45;
 
@@ -517,22 +832,22 @@ class CertificateTemplateEngine {
     // "This is to certify that"
     doc.fillColor(colors.text)
       .font(fontRegular)
-      .fontSize(14)
-      .text(this.getTranslation(data.language, 'thisIsToCertify'), 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      .fontSize(14);
+    drawSafeText(this.getTranslation(data.language, 'thisIsToCertify'), 0, currentY, {
+      align: 'center',
+      width: pageWidth
+    });
 
     currentY += 30;
 
-    // Student Name (Main Focus)
+    const sNameFont = getFont(data.studentName, fontBold, 'Latin_Bold'); // Use TTF fallback
     doc.fillColor(colors.primary)
-      .font(fontBold)
-      .fontSize(34)
-      .text(data.studentName, 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      .font(sNameFont)
+      .fontSize(34);
+    drawSafeText(data.studentName, 0, currentY, {
+      align: 'center',
+      width: pageWidth
+    });
 
     currentY += 40;
 
@@ -540,57 +855,75 @@ class CertificateTemplateEngine {
     doc.fillColor(colors.text)
       .opacity(0.85) // Slight mute as requested
       .font(fontRegular)
-      .fontSize(12)
-      .text(this.getTranslation(data.language, 'recognitionPhrase'), margin + 40, currentY, {
-        align: 'center',
-        width: contentWidth - 80
-      });
+      .fontSize(12);
+    drawSafeText(this.getTranslation(data.language, 'recognitionPhrase'), margin + 40, currentY, {
+      align: 'center',
+      width: contentWidth - 80
+    });
     doc.opacity(1); // Reset opacity
 
     currentY += 30;
 
     // "has successfully completed"
     doc.fillColor(colors.text)
-      .fontSize(14)
-      .text(this.getTranslation(data.language, 'hasSuccessfullyCompleted'), 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      .fontSize(14);
+    drawSafeText(this.getTranslation(data.language, 'hasSuccessfullyCompleted'), 0, currentY, {
+      align: 'center',
+      width: pageWidth
+    });
 
     currentY += 30;
 
-    // Course Name (ACCENT COLOR)
+    const cNameFont = getFont(data.courseName, fontBold, 'Latin_Bold');
     doc.fillColor(colors.accent)
-      .font(fontBold)
-      .fontSize(28)
-      .text(data.courseName, 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      .font(cNameFont)
+      .fontSize(28);
+    drawSafeText(data.courseName, 0, currentY, {
+      align: 'center',
+      width: pageWidth
+    });
 
     currentY += 40;
 
     // Course Duration
-    let durationText = "";
     if (data.startDate && data.endDate) {
-      durationText = `${this.getTranslation(data.language, 'duration')}: ${this.getTranslation(data.language, 'from')} ${new Date(data.startDate).toLocaleDateString()} ${this.getTranslation(data.language, 'to')} ${new Date(data.endDate).toLocaleDateString()}`;
-    } else {
-      durationText = `${this.getTranslation(data.language, 'dateOfIssue')}: ${new Date(data.issuedDate).toLocaleDateString()}`;
-    }
+      // Mixed Text: "From" (Native) "Date" (Latin) "To" (Native) "Date" (Latin)
+      // We MUST split this to avoid crash
+      const fromLabel = this.getTranslation(data.language, 'from');
+      const toLabel = this.getTranslation(data.language, 'to');
+      const durLabel = this.getTranslation(data.language, 'duration');
 
-    doc.fillColor(colors.text)
-      .font(fontRegular)
-      .fontSize(12)
-      .text(durationText, 0, currentY, {
-        align: 'center',
-        width: pageWidth
-      });
+      const date1 = new Date(data.startDate).toLocaleDateString();
+      const date2 = new Date(data.endDate).toLocaleDateString();
+
+      const segments = [
+        { text: `${durLabel}: `, font: fontRegular },
+        { text: `${fromLabel} `, font: fontRegular },
+        { text: date1, font: 'Latin_Regular' }, // Date is Latin
+        { text: ` ${toLabel} `, font: fontRegular },
+        { text: date2, font: 'Latin_Regular' }
+      ];
+      drawMixedTextCentered(doc, segments, currentY, pageWidth);
+
+    } else {
+      const issueLabel = this.getTranslation(data.language, 'dateOfIssue');
+      const dateStr = new Date(data.issuedDate).toLocaleDateString();
+      const segments = [
+        { text: `${issueLabel}: `, font: fontRegular },
+        { text: dateStr, font: 'Latin_Regular' }
+      ];
+      drawMixedTextCentered(doc, segments, currentY, pageWidth);
+    }
 
     currentY += 35;
 
     // Grade Badge (if exists)
     if (data.grade) {
       const gradeText = `${this.getTranslation(data.language, 'grade')}: ${data.grade}`;
+
+      // Set font to Native Bold before measuring to ensure stability
+      // Even if mixed, measuring with Native font is safer for the Label part
+      doc.font(fontBold);
       const gradeWidth = doc.widthOfString(gradeText);
       const badgePadding = 10;
       const badgeWidth = gradeWidth + (badgePadding * 2);
@@ -604,37 +937,37 @@ class CertificateTemplateEngine {
       doc.restore();
 
       doc.fillColor(colors.primary)
-        .font(fontBold)
-        .fontSize(12)
-        .text(gradeText, 0, currentY + 2, {
-          align: 'center',
-          width: pageWidth
-        });
+        .font(getFont(gradeText, fontBold, 'Latin_Bold'))
+        .fontSize(12);
+      drawSafeText(gradeText, 0, currentY + 2, {
+        align: 'center',
+        width: pageWidth
+      });
       currentY += 40;
     }
 
     // Description/Quote (Secondary, Italics)
     if (data.description) {
       doc.fontSize(10)
-        .font(fontOblique)
-        .fillColor(colors.secondary)
-        .text(`"${data.description}"`, margin + 40, currentY, {
-          width: contentWidth - 80,
-          align: 'center'
-        });
+        .font(getFont(data.description, fontOblique, 'Latin_Oblique'))
+        .fillColor(colors.secondary);
+      drawSafeText(`"${data.description}"`, margin + 40, currentY, {
+        width: contentWidth - 80,
+        align: 'center'
+      });
       currentY += 30;
     }
 
     // Disclaimer Line (Centered JUST ABOVE footer block)
     const disclaimerY = pageHeight - margin - 150 - 25;
 
-    doc.fillColor(colors.text)
-      .font(fontRegular)
-      .fontSize(10)
-      .text(`${this.getTranslation(data.language, 'authorityStatement')} ${data.instituteName} ${this.getTranslation(data.language, 'validFor')}`, margin, disclaimerY, {
-        align: 'center',
-        width: contentWidth
-      });
+    // Mixed Text: "Statement" (Native) "Institute" (English) "ValidFor" (Native)
+    const segments = [
+      { text: `${this.getTranslation(data.language, 'authorityStatement')} `, font: fontRegular, fontSize: 10 },
+      { text: data.instituteName, font: getFont(data.instituteName, fontRegular, 'Latin_Regular'), fontSize: 10 },
+      { text: ` ${this.getTranslation(data.language, 'validFor')}`, font: fontRegular, fontSize: 10 }
+    ];
+    drawMixedTextCentered(doc, segments, disclaimerY, pageWidth);
 
     // 4. Footer Section
     const footerHeight = 150;
@@ -652,19 +985,50 @@ class CertificateTemplateEngine {
     doc.fillColor(colors.text).font(fontRegular).fontSize(12);
 
     let leftInfoY = footerY;
-    doc.text(this.getTranslation(data.language, 'issuedBy'), footerLeftX, leftInfoY);
+    drawSafeText(this.getTranslation(data.language, 'issuedBy'), footerLeftX, leftInfoY);
 
     leftInfoY += 18;
-    doc.font(fontBold).fontSize(14).fillColor(colors.primary)
-      .text(data.instituteName, footerLeftX, leftInfoY, { width: 200 }); // Limit width
+    leftInfoY += 18;
+    doc.font(getFont(data.instituteName, fontBold, 'Latin_Bold')).fontSize(14).fillColor(colors.primary);
+    drawSafeText(data.instituteName, footerLeftX, leftInfoY, { width: 200 }); // Limit width
 
     leftInfoY += 25;
-    doc.font(fontRegular).fontSize(12).fillColor(colors.text)
-      .text(`${this.getTranslation(data.language, 'instructor')}: ${data.teacherName}`, footerLeftX, leftInfoY, { width: 200 });
+    // Teacher Name might be mixed "Instructor: Name"
+    // We already translate 'instructor'. If name is Latin and label is Native... logic is harder.
+    // For now, assume entire line uses Native font (fontRegular). 
+    // If TeacherName is English, it might fail. 
+    // Better to construct parts?
+    // Let's check Teacher Name specifically.
+    const tNameFont = getFont(data.teacherName, fontRegular, 'Latin_Regular');
+    // If we use tNameFont for the whole line, the Native Label will break if tNameFont is Helvetica.
+    // We MUST split.
+
+    // Helper to safely switch font
+    const safeFont = (fName) => {
+      try {
+        doc.font(fName);
+      } catch (e) {
+        console.warn(`Font switch failed for ${fName}, using Helvetica`);
+        doc.font('Helvetica');
+      }
+    };
+
+    // Label
+    const label = `${this.getTranslation(data.language, 'instructor')}: `;
+    safeFont(fontRegular);
+    doc.fontSize(12).fillColor(colors.text);
+    const fixedLabelWidth = 80;
+
+    drawSafeText(label, footerLeftX, leftInfoY, { width: fixedLabelWidth });
+
+    safeFont(tNameFont);
+    drawSafeText(data.teacherName, footerLeftX + fixedLabelWidth, leftInfoY);
 
     leftInfoY += 18;
-    doc.fillColor(colors.secondary)
-      .text(`${this.getTranslation(data.language, 'dateOfIssue')}: ${new Date(data.issuedDate).toLocaleDateString()}`, footerLeftX, leftInfoY, { width: 200 });
+    doc.fillColor(colors.secondary);
+    safeFont(fontRegular); // Reset to regular for Date label if needed, or stick to prev
+    drawSafeText(`${this.getTranslation(data.language, 'dateOfIssue')}: ${new Date(data.issuedDate).toLocaleDateString()}`, footerLeftX, leftInfoY, { width: 200 });
+
 
     // --- QR Code Section (Middle-Left) ---
     if (data.verificationUrl) {
@@ -681,14 +1045,14 @@ class CertificateTemplateEngine {
       await this.drawQRCode(doc, qrPayload, qrSectionX, qrY, qrSize);
 
       // Only "Scan to Verify" text below QR
-      doc.fontSize(8).fillColor(colors.secondary).font(fontBold)
-        .text(this.getTranslation(data.language, 'scanToVerify') || "Scan to Verify", qrSectionX, qrY + qrSize + 5, { width: qrSize, align: 'center' });
+      doc.fontSize(8).fillColor(colors.secondary).font(fontBold);
+      drawSafeText(this.getTranslation(data.language, 'scanToVerify') || "Scan to Verify", qrSectionX, qrY + qrSize + 5, { width: qrSize, align: 'center' });
     }
 
     // --- Right Block (Signature & Seal) ---
     let rightY = footerY;
-    doc.font(fontRegular).fontSize(10).fillColor(colors.text)
-      .text(`${this.getTranslation(data.language, 'certificateId')}: ${data.certificateId}`, footerRightX, rightY, { align: 'center', width: rightBlockWidth });
+    doc.font(fontRegular).fontSize(10).fillColor(colors.text);
+    drawSafeText(`${this.getTranslation(data.language, 'certificateId')}: ${data.certificateId}`, footerRightX, rightY, { align: 'center', width: rightBlockWidth });
 
     const sigLineY = footerBottomLimit - 30;
     const sealY = sigLineY - 80;
@@ -704,11 +1068,11 @@ class CertificateTemplateEngine {
       .lineTo(sigCenterX + (sigLineWidth / 2), sigLineY)
       .stroke();
 
-    doc.font(fontOblique).fontSize(16).fillColor(colors.primary)
-      .text(data.teacherName, footerRightX, sigLineY - 20, { align: 'center', width: rightBlockWidth });
+    doc.font(getFont(data.teacherName, fontOblique, 'Latin_Oblique')).fontSize(16).fillColor(colors.primary);
+    drawSafeText(data.teacherName, footerRightX, sigLineY - 20, { align: 'center', width: rightBlockWidth });
 
-    doc.font(fontRegular).fontSize(10).fillColor(colors.text)
-      .text(this.getTranslation(data.language, 'authorizedSignature'), footerRightX, sigLineY + 8, { align: 'center', width: rightBlockWidth });
+    doc.font(fontRegular).fontSize(10).fillColor(colors.text);
+    drawSafeText(this.getTranslation(data.language, 'authorizedSignature'), footerRightX, sigLineY + 8, { align: 'center', width: rightBlockWidth });
   }
 
   // Corner decorations

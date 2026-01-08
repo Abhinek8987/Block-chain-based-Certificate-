@@ -250,21 +250,30 @@ const transliterationFallbacks = {
     'இது சான்றளிக்கிறது': 'Idhu Saanralikkiradhu (This is to certify that)',
     'வெற்றிகரமாக முடித்துள்ளார்': 'Vetrikaramaaga Muditthullaar (has successfully completed)',
     'வழங்கியவர்': 'Vazhangiyavar (Issued by)',
-    'வழங்கிய தேதி': 'Vazhangiya Thethi (Date of Issue)'
+    'வழங்கிய தேதி': 'Vazhangiya Thethi (Date of Issue)',
+    'தரம்': 'Tharam (Grade)',
+    'விளக்கம்': 'Vilakkam (Description)',
+    'சான்றிதழ் எண்': 'Saandridhazh En (Certificate ID)'
   },
   telugu: {
     'పూర్తి చేసిన ప్రమాణపత్రం': 'Purti Chesina Pramaanapatram (Certificate of Completion)',
     'ఇది ధృవీకరిస్తుంది': 'Idi Dhruveekaristhundi (This is to certify that)',
     'విజయవంతంగా పూర్తి చేశారు': 'Vijayavanthamgaa Purti Cheshaaru (has successfully completed)',
     'జారీ చేసినవారు': 'Jaari Chesinavaaru (Issued by)',
-    'జారీ చేసిన తేదీ': 'Jaari Chesina Thedhi (Date of Issue)'
+    'జారీ చేసిన తేదీ': 'Jaari Chesina Thedhi (Date of Issue)',
+    'గ్రేడ్': 'Grade (గ్రేడ్)',
+    'వివరణ': 'Vivarna (Description)',
+    'ప్రమాణపత్ర ID': 'Pramaanapatra ID (Certificate ID)'
   },
   malayalam: {
     'പൂർത്തീകരണ സർട്ടിഫിക്കറ്റ്': 'Purttheekarana Certificate (Certificate of Completion)',
     'ഇത് സാക്ഷ്യപ്പെടുത്തുന്നു': 'Ithu Saakshyappeduthunnu (This is to certify that)',
     'വിജയകരമായി പൂർത്തിയാക്കി': 'Vijayakaramaayi Purtthiyaakki (has successfully completed)',
     'നൽകിയത്': 'Nalkiyathu (Issued by)',
-    'നൽകിയ തീയതി': 'Nalkiya Theeyathi (Date of Issue)'
+    'നൽകിയ തീയതി': 'Nalkiya Theeyathi (Date of Issue)',
+    'ഗ്രേഡ്': 'Grade (ഗ്രേഡ്)',
+    'വിവരണം': 'Vivaranam (Description)',
+    'സർട്ടിഫിക്കറ്റ് ID': 'Certificate ID (സർട്ടിഫിക്കറ്റ് ID)'
   },
   kannada: {
     'ಪೂರ್ಣಗೊಳಿಸುವಿಕೆಯ ಪ್ರಮಾಣಪತ್ರ': 'Purnagolisuvikkeya Pramanapatra (Certificate of Completion)',

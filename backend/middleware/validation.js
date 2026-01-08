@@ -19,41 +19,37 @@ const validateUserRegistration = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('Name must be between 2 and 100 characters'),
-  
+
   body('email')
     .isEmail()
-    .normalizeEmail()
     .withMessage('Please provide a valid email'),
-  
+
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
-  
+    .withMessage('Password must be at least 6 characters long'),
+
   body('role')
     .isIn(['admin', 'institution', 'student', 'verifier'])
     .withMessage('Invalid role'),
-  
+
   body('organization')
     .optional()
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Organization name must be between 2 and 200 characters'),
-  
+
   handleValidationErrors
 ];
 
 const validateUserLogin = [
   body('email')
     .isEmail()
-    .normalizeEmail()
     .withMessage('Please provide a valid email'),
-  
+
   body('password')
     .notEmpty()
     .withMessage('Password is required'),
-  
+
   handleValidationErrors
 ];
 
@@ -63,25 +59,25 @@ const validateCertificateCreation = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('Student name must be between 2 and 100 characters'),
-  
+
   body('studentEmail')
     .isEmail()
     .normalizeEmail()
     .withMessage('Please provide a valid student email'),
-  
+
   body('certificateType')
     .isIn(['Degree', 'Diploma', 'Certificate', 'Course Completion', 'Professional Certification'])
     .withMessage('Invalid certificate type'),
-  
+
   body('courseName')
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Course name must be between 2 and 200 characters'),
-  
+
   body('issueDate')
     .isISO8601()
     .withMessage('Please provide a valid issue date'),
-  
+
   body('expiryDate')
     .optional()
     .isISO8601()
@@ -92,29 +88,29 @@ const validateCertificateCreation = [
       }
       return true;
     }),
-  
+
   body('grade')
     .optional()
     .trim()
     .isLength({ max: 50 })
     .withMessage('Grade cannot exceed 50 characters'),
-  
+
   body('description')
     .optional()
     .trim()
     .isLength({ max: 1000 })
     .withMessage('Description cannot exceed 1000 characters'),
-  
+
   body('ipfsHash')
     .notEmpty()
     .withMessage('IPFS hash is required')
     .matches(/^Qm[1-9A-HJ-NP-Za-km-z]{44}$/)
     .withMessage('Invalid IPFS hash format'),
-  
+
   body('issuerAddress')
     .matches(/^0x[a-fA-F0-9]{40}$/)
     .withMessage('Invalid Ethereum address format'),
-  
+
   handleValidationErrors
 ];
 
@@ -123,7 +119,7 @@ const validateObjectId = [
   param('id')
     .isMongoId()
     .withMessage('Invalid ID format'),
-  
+
   handleValidationErrors
 ];
 
@@ -131,7 +127,7 @@ const validateCertificateId = [
   param('id')
     .isMongoId()
     .withMessage('Invalid certificate ID format'),
-  
+
   handleValidationErrors
 ];
 
@@ -142,17 +138,17 @@ const validateSearchQuery = [
     .trim()
     .isLength({ min: 1, max: 100 })
     .withMessage('Search query must be between 1 and 100 characters'),
-  
+
   query('limit')
     .optional()
     .isInt({ min: 1, max: 50 })
     .withMessage('Limit must be between 1 and 50'),
-  
+
   query('page')
     .optional()
     .isInt({ min: 1 })
     .withMessage('Page must be a positive integer'),
-  
+
   handleValidationErrors
 ];
 
@@ -190,12 +186,12 @@ const validateBlockchainData = [
     .optional()
     .matches(/^0x[a-fA-F0-9]{64}$/)
     .withMessage('Invalid transaction hash format'),
-  
+
   body('blockchainId')
     .optional()
     .isNumeric()
     .withMessage('Blockchain ID must be numeric'),
-  
+
   handleValidationErrors
 ];
 
@@ -204,7 +200,7 @@ const validateUserStatusUpdate = [
   body('isActive')
     .isBoolean()
     .withMessage('isActive must be a boolean value'),
-  
+
   handleValidationErrors
 ];
 
@@ -213,15 +209,15 @@ const validateVerificationLog = [
   body('verificationMethod')
     .isIn(['qr_scan', 'manual_search', 'direct_link', 'api_call'])
     .withMessage('Invalid verification method'),
-  
+
   body('verificationResult')
     .isIn(['valid', 'invalid', 'expired', 'revoked', 'not_found'])
     .withMessage('Invalid verification result'),
-  
+
   body('responseTime')
     .isNumeric()
     .withMessage('Response time must be numeric'),
-  
+
   handleValidationErrors
 ];
 

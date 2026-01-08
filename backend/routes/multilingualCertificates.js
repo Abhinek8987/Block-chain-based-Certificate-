@@ -35,7 +35,7 @@ router.post('/preview', protect, authorize('institution'), async (req, res, next
   try {
     console.log('🎨 Generating multilingual certificate preview...');
     console.log('📋 Request body:', req.body);
-    
+
     const {
       studentName,
       courseName,
@@ -57,7 +57,7 @@ router.post('/preview', protect, authorize('institution'), async (req, res, next
     const certificateData = {
       studentName,
       courseName,
-      institutionName: req.user.organization || req.user.name,
+      instituteName: req.user.organization || req.user.name,
       certificateId: certificateId || `PREVIEW-${Date.now()}`,
       grade,
       description,
@@ -71,7 +71,7 @@ router.post('/preview', protect, authorize('institution'), async (req, res, next
     try {
       // Generate preview using the multilingual generator
       const preview = await certificateGenerator.generatePreview(certificateData);
-      
+
       console.log('✅ Preview generated successfully');
 
       res.status(200).json({
@@ -83,7 +83,7 @@ router.post('/preview', protect, authorize('institution'), async (req, res, next
 
     } catch (previewError) {
       console.error('❌ Preview generation failed:', previewError);
-      
+
       // Fallback: Return a simple success message if preview fails
       res.status(200).json({
         success: true,
@@ -129,12 +129,12 @@ router.post('/generate', protect, authorize('institution'), async (req, res, nex
     // Auto-create student account if it doesn't exist
     const User = require('../models/User');
     const bcrypt = require('bcryptjs');
-    
+
     let student = await User.findOne({ email: studentEmail });
-    
+
     if (!student) {
       console.log(`🎓 Auto-creating student account for multilingual certificate: ${studentEmail}`);
-      
+
       student = await User.create({
         name: studentName,
         email: studentEmail,
@@ -142,7 +142,7 @@ router.post('/generate', protect, authorize('institution'), async (req, res, nex
         role: 'student',
         isVerified: true
       });
-      
+
       console.log(`✅ Student account created for multilingual certificate: ${student.email}`);
     }
 
@@ -229,7 +229,7 @@ router.post('/generate', protect, authorize('institution'), async (req, res, nex
     try {
       console.log('📧 Sending automatic email notification...');
       const verificationUrl = `${req.protocol}://${req.get('host')}/certificate/${certificate._id}`;
-      
+
       const emailData = {
         studentEmail: certificate.studentEmail,
         studentName: certificate.studentName,
@@ -244,7 +244,7 @@ router.post('/generate', protect, authorize('institution'), async (req, res, nex
 
       // Send email with PDF attachment
       const emailResult = await emailService.sendCertificateNotification(emailData, result.pdf_buffer);
-      
+
       if (emailResult.success) {
         console.log('✅ Email notification sent successfully');
       } else {

@@ -88,6 +88,15 @@ class EmailService {
             <li><strong>Issue Date:</strong> ${formattedDate}</li>
             <li><strong>Language:</strong> ${language.charAt(0).toUpperCase() + language.slice(1)}</li>
         </ul>
+
+        <h3>🔐 Student Account Created</h3>
+        <p>An account has been automatically created for you to access and manage your certificates.</p>
+        <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Login URL:</strong> <a href="http://localhost:3000/login">http://localhost:3000/login</a></p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${certificateData.studentEmail}</p>
+            <p style="margin: 5px 0;"><strong>Default Password:</strong> password123</p>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">(Please change your password after logging in)</p>
+        </div>
         
         <h3>🔐 Certificate Verification</h3>
         <p>Your certificate is secured on the blockchain and can be verified anytime:</p>

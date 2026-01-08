@@ -70,7 +70,7 @@ const certificateSchema = new mongoose.Schema({
   expiryDate: {
     type: Date,
     validate: {
-      validator: function(value) {
+      validator: function (value) {
         return !value || value > this.issueDate;
       },
       message: 'Expiry date must be after issue date'
@@ -92,7 +92,7 @@ const certificateSchema = new mongoose.Schema({
     type: String,
     required: [true, 'IPFS hash is required']
   },
-  
+
   // Verification Status
   isVerified: {
     type: Boolean,
@@ -110,7 +110,7 @@ const certificateSchema = new mongoose.Schema({
     type: String,
     default: 'application/pdf'
   },
-  
+
   // Multilingual support
   language: {
     type: String,
@@ -121,14 +121,14 @@ const certificateSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
-  
+
   // Status
   status: {
     type: String,
     enum: ['pending', 'issued', 'verified', 'revoked'],
     default: 'pending'
   },
-  
+
   // Revocation
   isRevoked: {
     type: Boolean,
@@ -170,43 +170,43 @@ certificateSchema.index({ studentEmail: 1, institutionId: 1 });
 certificateSchema.index({ certificateType: 1, status: 1 });
 
 // Virtual for certificate age
-certificateSchema.virtual('age').get(function() {
+certificateSchema.virtual('age').get(function () {
   return Math.floor((Date.now() - this.createdAt) / (1000 * 60 * 60 * 24)); // days
 });
 
 // Virtual for expiry status
-certificateSchema.virtual('isExpired').get(function() {
+certificateSchema.virtual('isExpired').get(function () {
   return this.expiryDate && this.expiryDate < new Date();
 });
 
 // Pre-save middleware
-certificateSchema.pre('save', function(next) {
+certificateSchema.pre('save', function (next) {
   // Set verification timestamp when verified
   if (this.isModified('isVerified') && this.isVerified && !this.verifiedAt) {
     this.verifiedAt = new Date();
   }
-  
+
   // Set status based on verification
   if (this.isModified('isVerified')) {
     this.status = this.isVerified ? 'verified' : 'issued';
   }
-  
+
   next();
 });
 
 // Instance methods
-certificateSchema.methods.incrementViewCount = function() {
+certificateSchema.methods.incrementViewCount = function () {
   this.viewCount += 1;
   return this.save();
 };
 
-certificateSchema.methods.incrementVerificationCount = function() {
+certificateSchema.methods.incrementVerificationCount = function () {
   this.verificationCount += 1;
   this.lastVerified = new Date();
   return this.save();
 };
 
-certificateSchema.methods.revoke = function(revokedBy, reason) {
+certificateSchema.methods.revoke = function (revokedBy, reason) {
   this.isRevoked = true;
   this.revokedAt = new Date();
   this.revokedBy = revokedBy;
@@ -216,7 +216,7 @@ certificateSchema.methods.revoke = function(revokedBy, reason) {
 };
 
 // Static methods
-certificateSchema.statics.getStatsByInstitution = async function(institutionId) {
+certificateSchema.statics.getStatsByInstitution = async function (institutionId) {
   const stats = await this.aggregate([
     { $match: { institutionId: mongoose.Types.ObjectId(institutionId) } },
     {
@@ -229,17 +229,17 @@ certificateSchema.statics.getStatsByInstitution = async function(institutionId) 
       }
     }
   ]);
-  
+
   return stats[0] || { total: 0, verified: 0, pending: 0, revoked: 0 };
 };
 
-certificateSchema.statics.getStatsByStudent = async function(studentEmail) {
+certificateSchema.statics.getStatsByStudent = async function (studentEmail) {
   const stats = await this.aggregate([
-    { 
-      $match: { 
+    {
+      $match: {
         studentEmail,
         isRevoked: { $ne: true } // Exclude revoked certificates from stats
-      } 
+      }
     },
     {
       $group: {
@@ -250,11 +250,11 @@ certificateSchema.statics.getStatsByStudent = async function(studentEmail) {
       }
     }
   ]);
-  
+
   return stats[0] || { total: 0, verified: 0, pending: 0 };
 };
 
-certificateSchema.statics.getGlobalStats = async function() {
+certificateSchema.statics.getGlobalStats = async function () {
   const stats = await this.aggregate([
     {
       $group: {
@@ -267,13 +267,13 @@ certificateSchema.statics.getGlobalStats = async function() {
       }
     }
   ]);
-  
+
   return stats[0] || { total: 0, verified: 0, pending: 0, revoked: 0, totalVerifications: 0 };
 };
 
-certificateSchema.statics.searchCertificates = async function(query, limit = 10) {
+certificateSchema.statics.searchCertificates = async function (query, limit = 10) {
   const searchRegex = new RegExp(query, 'i');
-  
+
   return this.find({
     $or: [
       { studentName: searchRegex },
@@ -285,9 +285,9 @@ certificateSchema.statics.searchCertificates = async function(query, limit = 10)
     ],
     isRevoked: false
   })
-  .populate('institutionId', 'name organization')
-  .limit(limit)
-  .sort({ createdAt: -1 });
+    .populate('institutionId', 'name organization')
+    .limit(limit)
+    .sort({ createdAt: -1 });
 };
 
 module.exports = mongoose.model('Certificate', certificateSchema);

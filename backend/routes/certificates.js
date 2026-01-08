@@ -37,7 +37,7 @@ router.post('/', protect, authorize('institution'), validateCertificateCreation,
       student = await User.create({
         name: req.body.studentName,
         email: req.body.studentEmail,
-        password: 'password123', // Plain text - will be hashed by pre-save hook
+        password: 'password123', // Default simple password as requested
         role: 'student',
         isVerified: true
       });
